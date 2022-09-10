@@ -1,0 +1,81 @@
+; pixels.pio
+; adapted from pico_scanvideo
+; (c) 2020 Raspberry Pi Ltd
+; SPDX-License-Identifier: BSD-3-Clause
+
+; CONFIGURATION
+; - run at 4x pixel clock speed (100 MHz)
+; - autopull 32
+; - fifocombine out
+
+.program vga_pixels
+
+% cpp-sdk {
+#define VP_COUNT(n) ((n)-1)
+#define VP_VSYNC vga_pixels_offset_cmd_VSYNC
+#define VP_HSYNC vga_pixels_offset_cmd_HSYNC
+#define VP_ALIGN vga_pixels_offset_cmd_ALIGN
+#define VP_SINGLE vga_pixels_offset_cmd_SINGLE
+#define VP_RLE vga_pixels_offset_cmd_RLE
+#define VP_RAW vga_pixels_offset_cmd_RAW
+#define VP_1BPP vga_pixels_offset_cmd_1BPP
+#define VP_1BPP_SCROLL vga_pixels_offset_cmd_1BPP_SCROLL
+#define VP_SCROLL_OFFSET(n) (usdk::pio_encode_out(pio_null, (n)))
+%}
+
+.origin 0
+.define IRQ_ACTIVE 1
+.define IRQ_INACTIVE 0
+
+public cmd_VSYNC:
+    wait irq IRQ_INACTIVE
+public entry_point:
+public cmd_HSYNC:
+    wait irq IRQ_ACTIVE [4]
+public cmd_ALIGN:
+    out pc, 16
+
+public cmd_SINGLE: ; 1 pixel
+    nop
+    out pins, 16
+    out pc, 16 [1]
+
+public cmd_RLE: ; min 2 pixels
+    out x, 16
+    out pins, 16 [1]
+_loop1:
+    jmp x-- _loop1 [3]
+    out pc, 16
+
+public cmd_RAW: ; min 2 pixels
+    out x, 16
+    out pins, 16 [1]
+_loop2:
+    nop [1]
+    out pins, 16
+    jmp x-- _loop2
+    out pc, 16
+
+; public cmd_1BPP: ; 1 pixel raw, multiple of 16 pixels
+;    out x, 16
+;    out pins, 16 [1]
+; _loop3:
+;    out y, 1
+;    jmp y-- _next3
+; _next3:
+;    mov pins, y
+;    jmp x-- _loop3
+;    out pc, 16
+
+public cmd_1BPP_SCROLL: ; 1 pixel lost, 1 insn, n pixels, 1 pixel lost, aligns
+    out x, 16
+    out exec, 16
+_loop4:
+    out y, 1
+    jmp y-- _next4
+_next4:
+    mov pins, y
+    jmp x-- _loop4
+    out NULL, 32 [1]
+    mov pins, NULL [1]
+    out pc, 16

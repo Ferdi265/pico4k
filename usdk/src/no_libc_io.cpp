@@ -1,0 +1,9 @@
+extern "C" int _sbrk() { return -1; }
+extern "C" int _kill() { return -1; }
+extern "C" int _getpid() { return -1; }
+extern "C" int _write() { return -1; }
+extern "C" int _close() { return -1; }
+extern "C" int _fstat() { return -1; }
+extern "C" int _isatty() { return -1; }
+extern "C" int _lseek() { return -1; }
+extern "C" int _read() { return -1; }

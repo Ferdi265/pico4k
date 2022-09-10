@@ -1,0 +1,20 @@
+#pragma once
+
+#if defined(PICOPACK_BOOT2_COPY2RAM)
+#define PICOPACK_LOAD_PART_OFFSET 0x10
+#elif defined(PICOPACK_BOOT2_EXO2RAM)
+#define PICOPACK_LOAD_PART_OFFSET 0x10
+#endif
+
+#ifndef PICOPACK_PART_ENTRY_OFFSET
+#define PICOPACK_PART_ENTRY_OFFSET 0xc0
+#endif
+
+#define BOOTROM_FUNC_TABLE 0x14
+#define BOOTROM_TABLE_LOOKUP 0x18
+
+#ifndef __ASSEMBLER__
+
+#define PICOPACK_LOAD_PART ((void (*)(void *, const void *))PICOPACK_LOAD_PART_OFFSET)
+
+#endif

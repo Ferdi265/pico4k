@@ -1,0 +1,15 @@
+#pragma once
+
+#ifndef VGA_PINS
+#define VGA_PINS
+
+#define VGA_PINS_RED_BASE 0
+#define VGA_PINS_RED_COUNT 5
+#define VGA_PINS_ALPHA_BASE 5
+#define VGA_PINS_GREEN_BASE 6
+#define VGA_PINS_GREEN_COUNT 5
+#define VGA_PINS_BLUE_BASE 11
+#define VGA_PINS_BLUE_COUNT 5
+#define VGA_PINS_SYNC_BASE 16
+
+#endif

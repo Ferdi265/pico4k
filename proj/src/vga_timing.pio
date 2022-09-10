@@ -1,0 +1,32 @@
+; timing.pio
+; adapted from pico_scanvideo
+; (c) 2020 Raspberry Pi Ltd
+; SPDX-License-Identifier: BSD-3-Clause
+
+; CONFIGURATION
+; - run at pixel clock speed (25.175 MHz)
+; - autopull 32
+; - fifocombine OUT
+
+; TIMING
+; - cmd format: <irq I> <14-bit N> <HSYNC> <VGA_TIMING_IRQ_VSYNC>
+; - first cmd takes effect 4 cycles after entry
+; - cmds take effect every N+6 cycles
+; - irq gets delivered 3 cycles before cmd takes effect
+
+; EXAMPLE (vga 640x480@60)
+; <irq VGA_TIMING_IRQ_ACTIVE>   <640+16-6> <NH> <NV> <nop> <96-6> <H> <NV> <nop> <48-6> <NH> <NV> x480
+; <irq VGA_TIMING_IRQ_INACTIVE> <640+16-6> <NH> <NV> <nop> <96-6> <H> <NV> <nop> <48-6> <NH> <NV> x 10
+; <irq VGA_TIMING_IRQ_INACTIVE> <640+16-6> <NH>  <V> <nop> <96-6> <H>  <V> <nop> <48-6> <NH>  <V> x  2
+; <irq VGA_TIMING_IRQ_INACTIVE> <640+16-6> <NH> <NV> <nop> <96-6> <H> <NV> <nop> <48-6> <NH> <NV> x 33
+
+.program vga_timing
+.wrap_target
+public entry_point:
+    out exec, 16
+    ; <exec'd insn>
+    out x, 14 [1]
+    out pins, 2
+loop:
+    jmp x-- loop
+.wrap

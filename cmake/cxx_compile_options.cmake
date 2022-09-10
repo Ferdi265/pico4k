@@ -1,0 +1,10 @@
+function(add_cxx_compile_options)
+    foreach(option ${ARGV})
+        add_compile_options($<$<COMPILE_LANGUAGE:CXX>:${option}>)
+    endforeach()
+endfunction()
+
+function(target_cxx_compile_options target mode)
+    list(SUBLIST ARGV 2 ${ARGC} options)
+    target_compile_options(${target} ${mode} $<$<COMPILE_LANGUAGE:CXX>:${options}>)
+endfunction()
