@@ -14,7 +14,8 @@ everything you need (VGA, PWM Audio, a few buttons). KiCad schematics are
 [available](https://datasheets.raspberrypi.org/rp2040/VGA-KiCAD.zip) to build
 your own since ordering it is expensive.
 
-This demo only uses the passive parts of the Pico Demo Base, everything else is unused.  
+This intro only uses the passive parts of the Pico Demo Base, everything else
+is unused.  
 Used:
 - the VGA "DAC" resistor ladder
 - the PWM Audio resistor-capacitor signal path
