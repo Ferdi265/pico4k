@@ -17,7 +17,7 @@ else()
     message(WARNING "unsupported compiler vendor ${CMAKE_CXX_COMPILER_ID}")
 endif()
 
-include_directories("${fix-clangd-includes}")
+include_directories($<$<COMPILE_LANGUAGE:CXX>:${fix-clangd-includes}>)
 foreach(include ${fix-clangd-includes})
     message(STATUS "fix_clangd_includes: found default include ${include}")
 endforeach()

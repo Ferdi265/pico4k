@@ -27,7 +27,7 @@ Dependencies:
 - CMake
 - arm-none-eabi-gcc (version 12 or later required! very scary constexpr magic required)
 - [pico-sdk](https://github.com/raspberrypi/pico-sdk) (run `git submodule update --init`)
-- [exomizer](https://bitbucket.org/magli143/exomizer) (designed for exomizer 3.1.1, expected to be in PATH when compiling)
+- [exomizer](https://bitbucket.org/magli143/exomizer) (designed for exomizer 3.1.1, shipped in `tools/exomizer/`)
 
 Compile with:
 
