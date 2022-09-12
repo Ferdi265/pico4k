@@ -3,6 +3,9 @@
 The first 4K intro for the Raspberry Pi Pico.  
 Wild compo entry released at Function 2022.
 
+This release comes with a new and shiny packer for Raspberry Pi Pico, see
+`PICOPACK.md`.
+
 ## Platform
 
 Raspberry Pi Pico - 264 KB RAM, 2 MB flash, 125+ MHz CPU (easily overclockable
