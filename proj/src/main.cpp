@@ -63,10 +63,14 @@ extern "C" void __isr isr_vblank() {
 
 // --- iovec construction ------------------------------------------------------
 
+// working factors: 1.0,    2.0,    2.4
+// aka:             125MHz, 250MHz, 300MHz
+constexpr float CLOCK_SPEED_FACTOR = 1.0;
+
 constexpr usdk::array meta_init_iovec = usdk::array_concat(
-    usdk::io_runtime_init(),
-    pwm_audio_config(),
-    pio_vga_config(),
+    usdk::io_runtime_init(CLOCK_SPEED_FACTOR),
+    pwm_audio_config(CLOCK_SPEED_FACTOR),
+    pio_vga_config(CLOCK_SPEED_FACTOR),
     dma_video_config(),
     dma_audio_config(),
     sin_interp_config(),
@@ -75,7 +79,6 @@ constexpr usdk::array meta_init_iovec = usdk::array_concat(
 const usdk::iovec::realized_iovec init_iovec = usdk::iovec::iovec_realize_v<meta_init_iovec>;
 
 constexpr usdk::array core1_meta_init_iovec = usdk::array_concat(
-    sin_interp_config(), // TODO: remove once we have actual audio code
     clamp_interp_config(), // needed for text
     irq_core1_config()
 );

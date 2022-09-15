@@ -9,14 +9,16 @@
 #include <hardware/structs/pll.h>
 #include <hardware/structs/clocks.h>
 #include <hardware/regs/m0plus.h>
+#include <hardware/vreg.h>
 
 #include <usdk/util/array.h>
 #include <usdk/util/iovec.h>
 #include <usdk/irq.h>
+#include <usdk/clock_dividers.h>
 
 namespace usdk {
 
-constexpr auto io_runtime_init() {
+constexpr auto io_runtime_init(float clock_factor) {
     using namespace usdk::iovec;
 
     constexpr uint32_t early_reset_bits = (
@@ -59,10 +61,15 @@ constexpr auto io_runtime_init() {
         0
     );
 
+    pll_config cfg = pll_config_for(clock_factor);
+
     return usdk::array_concat(
         // take peripherals for clock config out of reset
         io_write(RESETS_BASE + RESETS_RESET_OFFSET, ~early_reset_bits),
         io_wait(RESETS_BASE + RESETS_RESET_DONE_OFFSET, early_reset_bits),
+
+        // increase voltage to account for possibly higher clock frequency
+        io_write(VREG_AND_CHIP_RESET_BASE + VREG_AND_CHIP_RESET_VREG_OFFSET, VREG_AND_CHIP_RESET_VREG_EN_BITS | (VREG_VOLTAGE_MAX << VREG_AND_CHIP_RESET_VREG_VSEL_LSB)),
 
         // enable crystal oscillator
         io_write(XOSC_BASE + XOSC_CTRL_OFFSET, (XOSC_CTRL_ENABLE_VALUE_ENABLE << XOSC_CTRL_ENABLE_LSB)),
@@ -75,8 +82,8 @@ constexpr auto io_runtime_init() {
         )),
 
         // configure system PLL
-        io_write(PLL_SYS_BASE + PLL_CS_OFFSET, 1),
-        io_write(PLL_SYS_BASE + PLL_FBDIV_INT_OFFSET, 125),
+        io_write(PLL_SYS_BASE + PLL_CS_OFFSET, (1 << PLL_CS_REFDIV_LSB)),
+        io_write(PLL_SYS_BASE + PLL_FBDIV_INT_OFFSET, cfg.fbdiv),
         io_write(PLL_SYS_BASE + PLL_PWR_OFFSET, (
             (0 << PLL_PWR_VCOPD_LSB) |
             (1 << PLL_PWR_POSTDIVPD_LSB) |
@@ -85,8 +92,8 @@ constexpr auto io_runtime_init() {
         )),
         io_wait(PLL_SYS_BASE + PLL_CS_OFFSET, ((1 << PLL_CS_LOCK_LSB) | (1 << PLL_CS_REFDIV_LSB))),
         io_write(PLL_SYS_BASE + PLL_PRIM_OFFSET, (
-            (6 << PLL_PRIM_POSTDIV1_LSB) |
-            (2 << PLL_PRIM_POSTDIV2_LSB)
+            (cfg.postdiv1 << PLL_PRIM_POSTDIV1_LSB) |
+            (cfg.postdiv2 << PLL_PRIM_POSTDIV2_LSB)
         )),
         io_write(PLL_SYS_BASE + PLL_PWR_OFFSET, (
             (0 << PLL_PWR_VCOPD_LSB) |

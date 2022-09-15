@@ -5,6 +5,7 @@
 #include <usdk/gpio.h>
 #include <usdk/pwm.h>
 #include <usdk/dma.h>
+#include <usdk/clock_dividers.h>
 
 #include "dma_channels.h"
 
@@ -23,15 +24,16 @@ static_assert(samplerate_slice != left_slice);
 
 constexpr static uint32_t SAMPLE_RATE = 48000;
 
-constexpr auto pwm_audio_config() {
+constexpr auto pwm_audio_config(float clock_factor) {
     using namespace usdk::iovec;
 
-    // samplerate freq = 125MHz / (162 + 194/256) / 16 == 48KHz
-    // tuned clock divider to actual speaker output: (162 + 11/256)
-    usdk::pwm_config samplerate_cfg;
+    // samplerate freq = 48000Hz
+    // tuned freq to actual speaker output: 48021Hz
     static_assert(SAMPLE_RATE == 48000);
-    samplerate_cfg.set_clkdiv_int_frac(162, 11);
-    samplerate_cfg.set_wrap(15);
+    usdk::pwm_config samplerate_cfg;
+    usdk::pwm_clock_divider div = usdk::pwm_clock_divider_for(clock_factor, SAMPLE_RATE + 21, 16);
+    samplerate_cfg.set_clkdiv_int_frac(div.int_div, div.frac_div);
+    samplerate_cfg.set_wrap(div.wrap - 1);
 
     usdk::pwm_config pwm_cfg;
     pwm_cfg.set_clkdiv_int_frac(1, 0);

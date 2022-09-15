@@ -6,6 +6,7 @@
 #include <usdk/gpio.h>
 #include <usdk/dma.h>
 #include <usdk/irq.h>
+#include <usdk/clock_dividers.h>
 
 #include "vga_timing_irq.h"
 #include "vga_timing.pio.h"
@@ -25,24 +26,28 @@ constexpr uint32_t timing_offset = 0 + usdk::array_length(vga_pixels_program_ins
 constexpr uint32_t pio_program_end = timing_offset + usdk::array_length(vga_timing_program_instructions);
 static_assert(pio_program_end < 32);
 
-constexpr auto pio_vga_config() {
+constexpr auto pio_vga_config(float clock_factor) {
     using namespace usdk::iovec;
 
     constexpr usdk::array pixels_relocated = usdk::pio_program_relocate(usdk::to_array(vga_pixels_program_instructions), pixels_offset);
     constexpr usdk::array timing_relocated = usdk::pio_program_relocate(usdk::to_array(vga_timing_program_instructions), timing_offset);
     constexpr usdk::array pio_program = usdk::array_concat(pixels_relocated, timing_relocated);
 
+    usdk::pio_clock_divider timing_div = usdk::pio_clock_divider_for(clock_factor, 25 * 1000 * 1000);
+    usdk::pio_clock_divider pixels_div = usdk::pio_clock_divider_for(clock_factor, 100 * 1000 * 1000);
+    usdk::pio_clock_divider text_div = pixels_div;
+
     // timing
     usdk::pio_sm_config timing_cfg;
     timing_cfg.set_wrap(timing_offset + vga_timing_wrap_target, timing_offset + vga_timing_wrap);
-    timing_cfg.set_clkdiv_int_frac(5, 0); // 125MHz -> 25 MHz
+    timing_cfg.set_clkdiv_int_frac(timing_div.int_div, timing_div.frac_div);
     timing_cfg.set_fifo_join(PIO_FIFO_JOIN_TX);
     timing_cfg.set_out_shift(true, true, 32);
     timing_cfg.set_out_pins(VGA_PINS_SYNC_BASE, 2);
     // pixels
     usdk::pio_sm_config pixels_cfg;
     pixels_cfg.set_wrap(pixels_offset + vga_pixels_wrap_target, pixels_offset + vga_pixels_wrap);
-    pixels_cfg.set_clkdiv_int_frac(1, 64); // 125MHz -> 100 MHz
+    pixels_cfg.set_clkdiv_int_frac(pixels_div.int_div, pixels_div.frac_div);
     pixels_cfg.set_fifo_join(PIO_FIFO_JOIN_TX);
     pixels_cfg.set_out_shift(true, true, 32);
     pixels_cfg.set_out_pins(VGA_PINS_RED_BASE, 16);
@@ -50,7 +55,7 @@ constexpr auto pio_vga_config() {
     // 1bpp pixels
     usdk::pio_sm_config text_cfg;
     text_cfg.set_wrap(pixels_offset + vga_pixels_wrap_target, pixels_offset + vga_pixels_wrap);
-    text_cfg.set_clkdiv_int_frac(1, 64); // 125MHz -> 100 MHz
+    text_cfg.set_clkdiv_int_frac(text_div.int_div, text_div.frac_div);
     text_cfg.set_fifo_join(PIO_FIFO_JOIN_TX);
     text_cfg.set_out_shift(true, true, 32);
     text_cfg.set_out_pins(VGA_PINS_RED_BASE, 16);
