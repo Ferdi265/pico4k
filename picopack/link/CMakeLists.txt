@@ -36,4 +36,5 @@ pico_add_link_depend(picopack_link_final ${CMAKE_CURRENT_SOURCE_DIR}/final.ld)
 target_link_libraries(picopack_link_final INTERFACE
     "$<TARGET_PROPERTY:PICOPACK_TARGET_BOOT2>_library"
 )
+add_dependencies(picopack_link_final "$<TARGET_PROPERTY:PICOPACK_TARGET_BOOT2>_library")
 target_sources(picopack_link_final INTERFACE src/dummy.S)
