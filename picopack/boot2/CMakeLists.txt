@@ -46,3 +46,4 @@ endfunction()
 
 picopack_define_boot2(copy2ram src/copy2ram.S)
 picopack_define_boot2(exo2ram src/exo2ram.S)
+picopack_define_boot2(upkr2ram src/upkr2ram.S)
