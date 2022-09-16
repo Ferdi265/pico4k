@@ -52,7 +52,7 @@ __boot2_load_part:
         | saved regs                           | sp + 4*52
 */
 exo_decrunch:
-    push {r0}
+    mov r8, r0
     sub sp, sp, #4*52
 
     movs c256, #1
@@ -165,7 +165,7 @@ exo_decrunch:
 
 .Ldecrunch_end:
     add sp, sp, #4*52
-    pop {r2}
+    mov r2, r8
     adds r2, r2, #(PICOPACK_PART_ENTRY_OFFSET + 1)
     bx r2
 
