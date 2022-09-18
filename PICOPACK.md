@@ -1,7 +1,6 @@
 # PICOPACK
 
-[exomizer](https://bitbucket.org/magli143/exomizer)-based packer for Raspberry
-Pi Pico.
+Executable packer for Raspberry Pi Pico.
 
 ## Features
 
@@ -11,7 +10,9 @@ Pi Pico.
 
 ## Dependencies
 
-- [exomizer](https://bitbucket.org/magli143/exomizer) (designed for exomizer 3.1.1, expected to be in PATH when compiling)
+- for copy2ram: nothing, but this also doesn't pack anything
+- for exo2ram: [exomizer](https://bitbucket.org/magli143/exomizer) (designed for exomizer 3.1.1, expected to be in PATH when compiling)
+- for upkr2ram: [upkr](https://github.com/exoticorn/upkr) (designed for upkr 0.1.0, commit 629c5fc, expected to be in PATH when compiling)
 
 ## Example
 
