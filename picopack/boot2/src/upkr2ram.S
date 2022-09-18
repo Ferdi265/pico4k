@@ -21,13 +21,21 @@ __boot2_load_part:
 
 #define ALIGNUP(n, align) (((n) + (align) - 1) & ~((align) - 1))
 #define PROB_LEN (1 + 255 + 1 + 2*32 + 2*32)
-#define DATA_OFF ALIGNUP(PROB_LEN, 4)
+#define FRAME_SIZE ALIGNUP(PROB_LEN, 4)
 
+.type upkr_unpack, %function
+// r0 .. out_ptr (returned)
+// r1 .. in_ptr (returned)
+// r2 .. state
+// r3 .. offset
+// r4 .. prev_was_match
+// r5 .. subroutine arg (preserved)
+// r6 .. subroutine ret
+// r7 .. probs ptr
 upkr_unpack:
     mov r8, r0
-    sub sp, sp, #DATA_OFF
+    sub sp, sp, #FRAME_SIZE
 
-    // init probs
     mov r7, sp
     movs r2, #255
     adds r2, r2, #(PROB_LEN - 255)
@@ -42,10 +50,10 @@ upkr_unpack:
     bl upkr_decode_bit
     beq .Ldata
 .Lmatch:
-    // r6 = bit_ret = 1
+    // r6 = 1
     lsls r5, r6, #8
     cmp r4, #0
-    mov r4, r6 // prev_was_match = 1
+    mov r4, r6 // = 1
     bne 1f
 
     bl upkr_decode_bit
@@ -55,6 +63,7 @@ upkr_unpack:
     adds r5, r5, #1
     bl upkr_decode_length
     subs r5, r5, #1
+    // r4 = 1
     subs r3, r4, r6
     beq .Lend
 2:
@@ -85,13 +94,20 @@ upkr_unpack:
     b .Lloop
 
 .Lend:
-    add sp, sp, #DATA_OFF
+    add sp, sp, #FRAME_SIZE
     mov r2, r8
     adds r2, r2, #(PICOPACK_PART_ENTRY_OFFSET + 1)
     bx r2
 
-// arg in r5 (preserved)
-// ret in r6
+.type upkr_decode_length, %function
+// r0 .. length tmp (saved)
+// r1 ..
+// r2 ..
+// r3 ..
+// r4 .. bit pos (saved)
+// r5 .. context index (saved)
+// r6 .. length (returned)
+// r7 ..
 upkr_decode_length:
     push { r0, r4, r5, lr }
 
@@ -115,13 +131,20 @@ upkr_decode_length:
 
     pop { r0, r4, r5, pc }
 
-// arg in r5 (preserved)
-// ret in r6
+.type upkr_decode_bit, %function
+// r0 .. tmp / prob (saved)
+// r1 .. out_ptr (modified)
+// r2 .. state (modified)
+// r3 .. scratch (saved)
+// r4 ..
+// r5 .. context index (preserved)
+// r6 .. bit (returned)
+// r7 .. probs ptr (preserved)
 upkr_decode_bit:
-    push { r0, r3, r4, lr }
+    push { r0, r3, lr }
 
 .Lstate_loop:
-    lsrs r0, r2, #12
+    lsrs r3, r2, #12
     bne 1f
     lsls r2, r2, #8
     ldrb r6, [r1]
@@ -130,21 +153,21 @@ upkr_decode_bit:
     b .Lstate_loop
 1:
 
-    ldrb r4, [r7, r5]
-    mov r0, r4
+    ldrb r0, [r7, r5]
 
-    uxtb r6, r2
-    subs r6, r6, r4
+    lsrs r3, r2, #8
+    uxtb r2, r2
+
+    subs r6, r2, r0
     lsrs r6, r6, #31
     bne 1f
 
+    subs r2, r2, r0
     rsbs r0, r0, #0
     uxtb r0, r0
 1:
 
-    lsrs r3, r2, #8
     muls r3, r3, r0
-    uxtb r2, r2
     adds r2, r2, r3
 
     rsbs r3, r0, #0
@@ -156,14 +179,13 @@ upkr_decode_bit:
     cmp r6, #0
     bne 1f
 
-    subs r2, r2, r4
     rsbs r0, r0, #0
 1:
 
     strb r0, [r7, r5]
 
     cmp r6, #0
-    pop { r0, r3, r4, pc }
+    pop { r0, r3, pc }
 
 .p2align 2
 literals:
