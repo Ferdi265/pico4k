@@ -3,6 +3,11 @@
 The first 4K intro for the Raspberry Pi Pico.  
 Wild compo entry released at Function 2022.
 
+[![screenshot](https://content.pouet.net/files/screenshots/00092/00092223.png)](https://youtu.be/p3JvfWUPL2M)
+
+- [youtube](https://youtu.be/p3JvfWUPL2M)
+- [pouet.net](https://www.pouet.net/prod.php?which=92223)
+
 This release comes with a new and shiny packer for Raspberry Pi Pico, see
 `PICOPACK.md`.
 
