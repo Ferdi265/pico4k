@@ -7,7 +7,8 @@ namespace usdk {
 
 constexpr uint32_t XOSC_CLOCK_SPEED = 12 * 1000 * 1000;
 constexpr uint32_t BASE_CLOCK_SPEED = 125 * 1000 * 1000;
-constexpr uint32_t VCO_CLOCK_SPEED = 1500 * 1000 * 1000;
+constexpr uint32_t MIN_VCO_CLOCK_SPEED = 750 * 1000 * 1000;
+constexpr uint32_t MAX_VCO_CLOCK_SPEED = 1600 * 1000 * 1000;
 
 struct pll_config {
     uint32_t fbdiv;
@@ -15,35 +16,40 @@ struct pll_config {
     uint32_t postdiv2;
 };
 
-constexpr pll_config pll_config_for(float clock_factor) {
-    uint32_t sys_clock_speed = BASE_CLOCK_SPEED * clock_factor;
-
-    uint32_t vco_factor = VCO_CLOCK_SPEED / XOSC_CLOCK_SPEED;
-    while (VCO_CLOCK_SPEED % XOSC_CLOCK_SPEED != 0) /* cannot determine valid vco factor, not an integer multiple */;
-
-    uint32_t postdiv_factor = VCO_CLOCK_SPEED / sys_clock_speed;
-    while (VCO_CLOCK_SPEED % sys_clock_speed != 0) /* cannot determine valid postdiv factor, not an integer multiple */;
-
-    pll_config cfg = {
-        .fbdiv = vco_factor,
-        .postdiv1 = 1,
-        .postdiv2 = 1,
-    };
-
-    uint32_t factors[] = { 2, 3, 5, 7 };
-    for (uint32_t factor : factors) {
-        while (postdiv_factor % factor == 0) {
-            if (cfg.postdiv1 * factor < 8) { cfg.postdiv1 *= factor; postdiv_factor /= factor; }
-            else if (cfg.postdiv2 * factor < 8) { cfg.postdiv2 *= factor; postdiv_factor /= factor; }
-            else while (1) { /* cannot determine valid postdivider, too many factors */ }
+constexpr bool try_find_pll_config_for(uint32_t target, uint32_t& fbdiv, uint32_t& postdiv1, uint32_t& postdiv2) {
+    for (fbdiv = 320; fbdiv >= 16; fbdiv--) {
+        uint32_t vco = fbdiv * XOSC_CLOCK_SPEED;
+        if (vco < MIN_VCO_CLOCK_SPEED || vco > MAX_VCO_CLOCK_SPEED) continue;
+        for (postdiv1 = 7; postdiv1 >= 1; postdiv1--) {
+            for (postdiv2 = postdiv1; postdiv2 >= 1; postdiv2--) {
+                uint32_t out = vco / (postdiv1 * postdiv2);
+                if (out == target && vco % (postdiv1 * postdiv2) == 0) {
+                    return true;
+                }
+            }
         }
     }
 
-    while (postdiv_factor != 1) /* cannot determine valid postdivider, factor too large */;
+    return false;
+}
+
+constexpr pll_config pll_config_for(float clock_factor) {
+    uint32_t sys_clock_speed = BASE_CLOCK_SPEED * clock_factor;
+
+    uint32_t fbdiv = 0;
+    uint32_t postdiv1 = 0;
+    uint32_t postdiv2 = 0;
+    bool found = try_find_pll_config_for(sys_clock_speed, fbdiv, postdiv1, postdiv2);
+    while (!found) /* failed to determine pll config for requested clock factor */;
+
+    pll_config cfg = {
+        .fbdiv = fbdiv,
+        .postdiv1 = postdiv1,
+        .postdiv2 = postdiv2
+    };
 
     return cfg;
 }
-
 
 struct pio_clock_divider {
     uint32_t int_div;
