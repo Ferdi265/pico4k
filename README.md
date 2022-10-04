@@ -14,7 +14,7 @@ This release comes with a new and shiny packer for Raspberry Pi Pico, see
 ## Platform
 
 Raspberry Pi Pico - 264 KB RAM, 2 MB flash, 125+ MHz CPU (easily overclockable
-to 250 MHz and more)
+to 420 MHz and more)
 
 The [Pico Demo Base](https://shop.pimoroni.com/products/pimoroni-pico-vga-demo-base)
 seems to be the standard way to do demo stuff on the Pico, it conveniently has
