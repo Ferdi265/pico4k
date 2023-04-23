@@ -66,7 +66,7 @@ extern "C" void __isr isr_vblank() {
 // working factors: 1.0,    2.0,    2.4     3.0     3.2     3.36    3.488   3.504
 // aka:             125MHz, 250MHz, 300MHz, 375MHz, 400MHz, 420MHz, 436MHz, 438MHz
 //                                                                  (with glitches)
-constexpr float CLOCK_SPEED_FACTOR = 1.0;
+constexpr float CLOCK_SPEED_FACTOR = 3.36;
 
 constexpr usdk::array meta_init_iovec = usdk::array_concat(
     usdk::io_runtime_init(CLOCK_SPEED_FACTOR),

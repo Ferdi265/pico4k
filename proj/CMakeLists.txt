@@ -20,6 +20,6 @@ target_link_libraries(${PROJ_NAME}_main PRIVATE
 )
 
 add_executable(${PROJ_NAME})
-picopack_link(${PROJ_NAME} exo2ram PARTS
+picopack_link(${PROJ_NAME} upkr2ram PARTS
     ${PROJ_NAME}_main
 )
