@@ -28,14 +28,14 @@ def find_upkr():
     print("could not find upkr compressor!", file = sys.stderr)
     sys.exit(1)
 
-def part_exo2ram(infile, outfile):
+def part_upkr2ram(infile, outfile):
     upkr_cmd = find_upkr()
     upkr = subprocess.run(
         upkr_cmd + ["pack", "-l", "9", infile, outfile]
     )
 
     if upkr.returncode != 0:
-        sys.exit("Failed to compress data with exomizer")
+        sys.exit("Failed to compress data with upkr")
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -45,7 +45,7 @@ def parse_args():
 
 def main():
     args = parse_args()
-    part_exo2ram(args.infile, args.outfile)
+    part_upkr2ram(args.infile, args.outfile)
 
 if __name__ == "__main__":
     main()
