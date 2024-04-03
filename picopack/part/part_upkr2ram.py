@@ -31,7 +31,7 @@ def find_upkr():
 def part_upkr2ram(infile, outfile):
     upkr_cmd = find_upkr()
     upkr = subprocess.run(
-        upkr_cmd + ["pack", "-l", "9", infile, outfile]
+        upkr_cmd + ["-l", "9", infile, outfile]
     )
 
     if upkr.returncode != 0:
