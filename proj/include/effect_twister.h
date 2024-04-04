@@ -12,12 +12,12 @@
 #include "vga_config.h"
 #include "interp_config.h"
 
-uint32_t cur_twister_buffer = 0;
-uint32_t cur_twister_frame = 0;
+inline uint32_t cur_twister_buffer = 0;
+inline uint32_t cur_twister_frame = 0;
 
 const uint16_t twister_colors[] = { 0x0001, 0x0040, 0x0800, 0x0041 };
 
-alignas(4) uint16_t batch_twister_cmds[2][32];
+alignas(4) inline uint16_t batch_twister_cmds[2][32];
 
 [[gnu::always_inline]] inline void render_twister() {
     uint32_t y = twister_batch_index;

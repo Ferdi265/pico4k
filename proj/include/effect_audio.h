@@ -83,7 +83,7 @@ struct beat_state {
 
 // --- refill ------------------------------------------------------------------
 
-beat_state b_state;
+inline beat_state b_state;
 [[gnu::always_inline]] inline void refill_sample_buffer() {
     uint32_t * sample_buffer = sample_buffers[current_sample_buffer];
 

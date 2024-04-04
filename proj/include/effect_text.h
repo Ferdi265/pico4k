@@ -57,12 +57,12 @@ constexpr auto msg = scrollerfix(
     "\n\n\n\n"
 );
 
-const char * msgptr;
-size_t pausectr = 0;
+inline const char * msgptr;
+inline size_t pausectr = 0;
 
-uint32_t cur_text_frame = 0;
-char textmode_framebuffer[30][81];
-int32_t text_sine[64];
+inline uint32_t cur_text_frame = 0;
+inline char textmode_framebuffer[30][81];
+inline int32_t text_sine[64];
 
 [[gnu::always_inline]] inline void init_text() {
     memset(&framebuffer, 0xff, sizeof (pio_1bpp_framebuffer));
