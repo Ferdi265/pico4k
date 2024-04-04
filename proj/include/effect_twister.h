@@ -6,8 +6,8 @@
 #include <hardware/sync.h>
 #include <hardware/divider.h>
 #include <usdk/util/array.h>
+#include <usdk/util/mem.h>
 
-#include "memmove.h"
 #include "font_config.h"
 #include "vga_config.h"
 #include "interp_config.h"

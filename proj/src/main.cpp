@@ -15,13 +15,13 @@
 
 #include <usdk/util/mask.h>
 #include <usdk/util/array.h>
+#include <usdk/util/mem.h>
 #include <usdk/util/iovec.h>
 #include <usdk/irq.h>
 #include <usdk/interp.h>
 #include <usdk/runtime.h>
 #include <usdk/multicore.h>
 
-#include "memmove.h"
 #include "irq_config.h"
 #include "font_config.h"
 #include "pwm_config.h"

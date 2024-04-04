@@ -6,8 +6,8 @@
 #include <pico/platform.h>
 #include <hardware/sync.h>
 #include <usdk/util/array.h>
+#include <usdk/util/mem.h>
 
-#include "memmove.h"
 #include "font_config.h"
 #include "vga_config.h"
 #include "interp_config.h"
@@ -76,7 +76,7 @@ inline int32_t text_sine[64];
     framebuffer[FB_HEIGHT - 1][4 + FB_WIDTH/16 + 1] = VP_VSYNC;
 
     msgptr = msg.begin();
-    strcpy(&textmode_framebuffer[10][34], "P I C O 4 K");
+    usdk::strcpy(&textmode_framebuffer[10][34], "P I C O 4 K");
     memset(&textmode_framebuffer[4][0], H, 81);
     memset(&textmode_framebuffer[29-4][0], H, 81);
 }
@@ -123,7 +123,7 @@ inline int32_t text_sine[64];
     }
 
     if (cur_text_frame % 8 == 0) {
-        usdk::memmove(&textmode_framebuffer[16][1], &textmode_framebuffer[16][0], 80);
+        usdk::memmove_noinline(&textmode_framebuffer[16][1], &textmode_framebuffer[16][0], 80);
 
         char c = *msgptr;
         textmode_framebuffer[16][0] = c;
