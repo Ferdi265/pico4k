@@ -36,6 +36,7 @@ Dependencies:
 - arm-none-eabi-gcc (version 12 or later required! very scary constexpr magic required)
 - [pico-sdk](https://github.com/raspberrypi/pico-sdk) (run `git submodule update --init`)
 - [exomizer](https://bitbucket.org/magli143/exomizer) (designed for exomizer 3.1.1, shipped in `tools/exomizer/`)
+- [upkr](https://github.com/exoticorn/upkr) (designed for upkr 0.2.2, shipped in `tools/upkr/`)
 
 Compile with:
 
