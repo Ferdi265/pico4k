@@ -14,7 +14,7 @@ function(picopack_add_part_library target part-target part-num)
 
     add_custom_target(${part-target}_packed_bin DEPENDS ${packed_bin})
     add_custom_command(OUTPUT ${packed_bin} DEPENDS ${original_bin}
-        COMMAND ${CMAKE_COMMAND} -E env "EXORAW=$ENV{EXORAW}" "${Python3_EXECUTABLE}"
+        COMMAND ${CMAKE_COMMAND} -E env "EXORAW=$ENV{EXORAW}" env "UPKR=$ENV{UPKR}" "${Python3_EXECUTABLE}"
         "${PICOPACK_PART_DIR}/part_$<TARGET_PROPERTY:${target},PICOPACK_TARGET_BOOT2>.py" ${original_bin} ${packed_bin}
     )
     add_dependencies(${part-target}_packed_bin exomizer)
